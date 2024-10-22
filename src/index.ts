@@ -15,7 +15,7 @@ app.get("/", (c) => {
 
 app.get("/pdf", async (c) => {
   const paramsSchema = z.object({
-    url: z.string().url().default("https://example.com"),
+    url: z.string().url(),
     printBackground: z.string().default("false"),
     format: z.string().default("A4"),
   });
@@ -67,12 +67,13 @@ app.notFound((c) => {
 app.onError((err, c) => {
   console.error(err);
   if (err instanceof ZodError) {
-    const messages = err.flatten((issue: ZodIssue) => ({
+    const messages = err.errors.map((issue: ZodIssue) => ({
       message: issue.message,
-      errorCode: issue.code,
+      error: issue.code,
+      path: issue.path.join("."),
     }));
 
-    return c.json({ message: messages.formErrors, status: 400, type: "zod" });
+    return c.json({ message: messages, status: 400, type: "zod" });
   }
 
   return c.json({ message: "Something went wrong", status: 500 });
