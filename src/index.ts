@@ -73,9 +73,11 @@ app.onError((err, c) => {
       path: issue.path.join("."),
     }));
 
+    c.status(400);
     return c.json({ message: messages, status: 400, type: "zod" });
   }
 
+  c.status(500);
   return c.json({ message: "Something went wrong", status: 500 });
 });
 
